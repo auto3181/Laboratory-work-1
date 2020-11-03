@@ -1,29 +1,32 @@
-import csv
+import string
 import re
 
-symb = 0
-punctuation_symb = 0
-spaces = 0
-words = 0
-sentences = 0
+
+def show_ans():
+    print("Общее количество символов в файле: ", all_letters_count)
+    print("Общее количесто символов без пробелов: ", letters_count_without_spaces)
+    print("Количество символов без знаков препинания: ", letter_count_without_punctuation)
+    print("Количество слов в файле: ", words_count)
+    print("Количество предложений: ", sentences_count)
+
+
+punctuation_list = list(string.punctuation)  # список знаков препинания
+punctuation_count = 0 
+spaces_count = 0
+all_letters_count = 0
+letters_count_without_spaces = 0
+words_count = 0
+sentences_count = 0
 
 with open('steam_description_data.csv', encoding='utf-8') as f:
-    reader = csv.reader(f)
-    for row in reader:
-        string = ','.join(row)
-        symb += len(string)
-        spaces += string.count(' ')
+    for line in f:
+        all_letters_count += len(line)  # считаю длинну считанной строчки
+        spaces_count += line.count(' ')  # считаю количество пробелов в строчке
+        words_count += len(line.split())  # считаю количество слов в строчке, учитывая, что разделитель - пробел 
+        for i in punctuation_list:  # считаю количество знаков препинания
+            punctuation_count += line.count(i)
+        sentences_count += len(re.findall(r"([A-Z][^\.!?]*[\.!?])", line))  # считаю количество предложений
 
-        punctuation_symb += string.count('.') + string.count(',') + string.count('!') + string.count('?')
-        punctuation_symb += string.count('\"') + string.count('\'') + string.count(':') + string.count(';')
-        punctuation_symb += string.count('>') + string.count('<')
-        punctuation_symb += string.count('-') + string.count('(') + string.count(')')
-
-        words += len(re.findall(r"(\w+'\w+)|(\w+-\w+'\w+)|(\w+-\w+'\w)|\w+", string))
-        sentences += len(re.findall(r"([A-Z][^\.!?]*[\.!?])", string))
-
-print("Общее количество символов в файле: ", symb)
-print("Общее количесто символов без пробелов: ", symb - spaces)
-print("Количество символов без знаков препинания: ", symb - punctuation_symb)
-print("Количество слов в файле: ", words)
-print("Количество предложений: ", sentences)
+letters_count_without_spaces = all_letters_count - spaces_count  # количество слов без пробелов
+letter_count_without_punctuation = letters_count_without_spaces - punctuation_count  # количество букв без знаков преп
+show_ans()
